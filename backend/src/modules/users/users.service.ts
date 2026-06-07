@@ -29,8 +29,7 @@ export class UsersService {
     return user;
   }
 
-  async validateUser(dataLogin: LoginDto) {
-    const { email, password } = dataLogin;
+  async validateUser(email: string, password: string) {
     const user = await this.userRepository.findOneBy({ email });
     if (!user) {
       throw new NotFoundException('Email không tồn tại');

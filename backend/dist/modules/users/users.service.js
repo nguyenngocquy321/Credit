@@ -73,8 +73,7 @@ let UsersService = class UsersService {
         const user = await this.userRepository.findOneBy({ email });
         return user;
     }
-    async validateUser(dataLogin) {
-        const { email, password } = dataLogin;
+    async validateUser(email, password) {
         const user = await this.userRepository.findOneBy({ email });
         if (!user) {
             throw new common_2.NotFoundException('Email không tồn tại');

@@ -6,17 +6,13 @@ import { UsersService } from '../users/users.service';
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private userService: UsersService) {
-    super({
-      usernameField: 'email',
-      passwordField: 'password',
-    });
+    super();
   }
 
-  // Passport tự động gọi hàm này khi bạn sử dụng AuthGuard('local')
-  async validate(email: string, password: string): Promise<any> {
-    const user = await this.userService.validateUser(email, password);
+  async validate(username: string, password: string): Promise<any> {
+    const user = await this.userService.validateUser(username, password);
     if (!user) {
-      throw new UnauthorizedException('Thông tin đăng nhập không chính xác');
+      throw new UnauthorizedException();
     }
     return user;
   }

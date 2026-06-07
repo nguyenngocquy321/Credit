@@ -17,16 +17,13 @@ const users_service_1 = require("../users/users.service");
 let LocalStrategy = class LocalStrategy extends (0, passport_1.PassportStrategy)(passport_local_1.Strategy) {
     userService;
     constructor(userService) {
-        super({
-            usernameField: 'email',
-            passwordField: 'password',
-        });
+        super();
         this.userService = userService;
     }
-    async validate(email, password) {
-        const user = await this.userService.validateUser(email, password);
+    async validate(username, password) {
+        const user = await this.userService.validateUser(username, password);
         if (!user) {
-            throw new common_1.UnauthorizedException('Thông tin đăng nhập không chính xác');
+            throw new common_1.UnauthorizedException();
         }
         return user;
     }

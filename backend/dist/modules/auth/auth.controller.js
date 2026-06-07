@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const users_service_1 = require("../users/users.service");
 const create_user_dto_1 = require("../users/dto/create-user.dto");
+const dataLogin_1 = require("./dto/dataLogin");
 let AuthController = class AuthController {
     authService;
     userService;
@@ -29,7 +30,7 @@ let AuthController = class AuthController {
     }
     async login(dataLogin) {
         const { email = '', password = '' } = dataLogin;
-        return this.userService.validateUser({ email, password });
+        return this.userService.validateUser(email, password);
     }
 };
 exports.AuthController = AuthController;
@@ -44,7 +45,7 @@ __decorate([
     (0, common_1.Post)('/login'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [dataLogin_1.LoginDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 exports.AuthController = AuthController = __decorate([
