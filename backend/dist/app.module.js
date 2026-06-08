@@ -13,6 +13,11 @@ const typeorm_1 = require("@nestjs/typeorm");
 const users_module_1 = require("./modules/users/users.module");
 const auth_module_1 = require("./modules/auth/auth.module");
 const user_entity_1 = require("./modules/users/entities/user.entity");
+const refresh_tokens_1 = require("./modules/auth/entities/refresh_tokens");
+const package_module_1 = require("./modules/package/package.module");
+const package_entity_1 = require("./modules/package/entities/package.entity");
+const core_1 = require("@nestjs/core");
+const role_auth_guard_1 = require("./guards/role-auth.guard");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -27,11 +32,18 @@ exports.AppModule = AppModule = __decorate([
                 username: process.env.DB_USER,
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
-                entities: [user_entity_1.User],
+                entities: [user_entity_1.User, refresh_tokens_1.RefreshTokenEntity, package_entity_1.Package],
                 synchronize: true,
             }),
             users_module_1.UsersModule,
             auth_module_1.AuthModule,
+            package_module_1.PackageModule,
+        ],
+        providers: [
+            {
+                provide: core_1.APP_GUARD,
+                useClass: role_auth_guard_1.RolesGuard,
+            },
         ],
     })
 ], AppModule);

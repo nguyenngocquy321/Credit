@@ -8,16 +8,24 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-    ports:
-      - "5432:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
     networks:
       - credit-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 5s
       timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:latest
+    container_name: redis-server
+    restart: always
+    networks:
+      - credit-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
       retries: 5
 
   backend:
@@ -33,10 +41,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - credit-net
-    extra_hosts:
-      - "db:172.18.0.2"
 
   frontend:
     build: ./frontend
@@ -57,3 +65,4 @@ networks:
 
 volumes:
   db_data:
+  redis_data:

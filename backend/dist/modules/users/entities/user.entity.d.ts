@@ -5,6 +5,8 @@ export declare class User {
     password: string;
     role: string;
     total_credits: number;
+    isDeleted: boolean;
+    isBanned: boolean;
     created_at: Date;
     updated_at: Date;
 }

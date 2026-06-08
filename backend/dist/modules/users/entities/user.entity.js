@@ -18,6 +18,8 @@ let User = class User {
     password;
     role;
     total_credits;
+    isDeleted;
+    isBanned;
     created_at;
     updated_at;
 };
@@ -46,6 +48,14 @@ __decorate([
     (0, typeorm_1.Column)({ type: 'decimal', precision: 10, scale: 2, default: 0 }),
     __metadata("design:type", Number)
 ], User.prototype, "total_credits", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'boolean', default: false }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isDeleted", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'boolean', default: false }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isBanned", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)

@@ -4,13 +4,12 @@ import { Suspense } from 'react';
 import Header from '@components/layout/Header/Header';
 import Footer from '@components/layout/Footer';
 import NotFound from '@pages/NotFound/NotFound';
+import { AuthProvider } from './contexts/authProvider';
 function App() {
-  const t = 1;
   return (
-    <>
+    <AuthProvider>
       <Suspense fallback={<div>Loading...</div>}>
         <Header />
-
         <Routes>
           {routers.map((router) => {
             return <Route key={router.path} path={router.path} element={router.element} />;
@@ -19,7 +18,7 @@ function App() {
         </Routes>
         <Footer />
       </Suspense>
-    </>
+    </AuthProvider>
   );
 }
 

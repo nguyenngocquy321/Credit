@@ -52,22 +52,34 @@ const typeorm_2 = require("typeorm");
 const user_entity_1 = require("./entities/user.entity");
 const bcrypt = __importStar(require("bcrypt"));
 const common_2 = require("@nestjs/common");
+const jwt_1 = require("@nestjs/jwt");
+const refresh_tokens_1 = require("../auth/entities/refresh_tokens");
 let UsersService = class UsersService {
     userRepository;
-    constructor(userRepository) {
+    jwtService;
+    refreshTokenRepository;
+    constructor(userRepository, jwtService, refreshTokenRepository) {
         this.userRepository = userRepository;
+        this.jwtService = jwtService;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
-    async createUser(createUserDto) {
+    async createUser(userData) {
         const existingUser = await this.userRepository.findOne({
-            where: { email: createUserDto.email },
+            where: { email: userData.email },
         });
         if (existingUser) {
             throw new common_1.ConflictException('Email này đã được sử dụng');
         }
-        const user = this.userRepository.create(createUserDto);
-        const hashedPassword = await bcrypt.hash(user.password, 10);
-        user.password = hashedPassword;
-        return this.userRepository.save(user);
+        if (!userData.password) {
+            throw new common_1.BadRequestException('Mật khẩu là bắt buộc');
+        }
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(userData.password, salt);
+        const newUser = this.userRepository.create({
+            ...userData,
+            password: hashedPassword,
+        });
+        return await this.userRepository.save(newUser);
     }
     async findByEmail(email) {
         const user = await this.userRepository.findOneBy({ email });
@@ -84,11 +96,34 @@ let UsersService = class UsersService {
         }
         return user;
     }
+    async saveRefreshToken(userId, refreshToken, expiresAt) {
+        const tokenRecord = this.refreshTokenRepository.create({
+            token_hash: refreshToken,
+            expires_at: expiresAt,
+            user: { id: userId },
+        });
+        const hashedRefToken = await bcrypt.hash(refreshToken, 10);
+        tokenRecord.token_hash = hashedRefToken;
+        return await this.refreshTokenRepository.save(tokenRecord);
+    }
+    async verifyRefreshToken(refreshToken, userId) {
+        const refToken = await this.refreshTokenRepository.findOne({
+            where: { user: { id: userId } },
+        });
+        if (!refToken || refToken.is_revoked) {
+            return false;
+        }
+        const isMatch = await bcrypt.compare(refreshToken, refToken.token_hash);
+        return isMatch;
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __param(2, (0, typeorm_1.InjectRepository)(refresh_tokens_1.RefreshTokenEntity)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        jwt_1.JwtService,
+        typeorm_2.Repository])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map

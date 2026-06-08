@@ -13,22 +13,31 @@ const auth_controller_1 = require("./auth.controller");
 const users_module_1 = require("../users/users.module");
 const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
+const local_strategy_1 = require("../passports/local.strategy");
+const config_1 = require("@nestjs/config");
+const jwt_strategy_1 = require("../passports/jwt.strategy");
+const typeorm_1 = require("@nestjs/typeorm");
+const refresh_tokens_1 = require("./entities/refresh_tokens");
+const redis_service_1 = require("../redis/redis.service");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService],
+        providers: [auth_service_1.AuthService, local_strategy_1.LocalStrategy, jwt_strategy_1.JwtStrategy, redis_service_1.RedisService],
         imports: [
-            users_module_1.UsersModule,
+            typeorm_1.TypeOrmModule.forFeature([refresh_tokens_1.RefreshTokenEntity]),
+            config_1.ConfigModule.forRoot({ envFilePath: '../.env' }),
+            (0, common_1.forwardRef)(() => users_module_1.UsersModule),
             passport_1.PassportModule,
             jwt_1.JwtModule.register({
                 global: true,
-                secret: '92a50e03cfafb15abaf1819b66f5ee8277b86ea734568d7543c4d5e747ca0dc1',
-                signOptions: { expiresIn: '1h' },
+                secret: process.env.JWT_SECRET,
+                signOptions: { expiresIn: '30s' },
             }),
         ],
+        exports: [typeorm_1.TypeOrmModule],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

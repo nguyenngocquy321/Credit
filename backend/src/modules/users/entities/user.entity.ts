@@ -25,7 +25,11 @@ export class User {
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   total_credits: number;
+  @Column({ type: 'boolean', default: false })
+  isDeleted: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  isBanned: boolean;
   @CreateDateColumn()
   created_at: Date;
 
